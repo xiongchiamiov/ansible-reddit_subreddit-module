@@ -13,7 +13,8 @@ def main():
         'password': {'required': True, 'type': 'str'},
         'subreddit': {'required': True, 'type': 'str'},
     }
-    module = AnsibleModule(argument_spec=argument_spec)
+    module = AnsibleModule(argument_spec=argument_spec,
+                           supports_check_mode=True)
 
     # According to reddit API rules, needs to be in the format:
     #     <platform>:<app ID>:<version string> (by /u/<reddit username>)
@@ -30,7 +31,7 @@ def main():
     current_text = subreddit.stylesheet().stylesheet
     new_text = '.foo { color: red; }'
     changed = current_text != new_text
-    if changed:
+    if changed and not module.check_mode:
         # Note that subreddit.stylesheet is different than
         # subreddit.stylesheet() !
         subreddit.stylesheet.update(new_text)
