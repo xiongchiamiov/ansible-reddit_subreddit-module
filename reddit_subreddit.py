@@ -12,6 +12,7 @@ def main():
         'username': {'required': True, 'type': 'str'},
         'password': {'required': True, 'type': 'str'},
         'subreddit': {'required': True, 'type': 'str'},
+        'path': {'required': True, 'type': 'str'},
     }
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True)
@@ -29,7 +30,7 @@ def main():
 
     subreddit = reddit.subreddit(module.params['subreddit'])
     current_text = subreddit.stylesheet().stylesheet
-    new_text = '.foo { color: red; }'
+    new_text = open(module.params['path'], 'r').read()
     changed = current_text != new_text
     if changed and not module.check_mode:
         # Note that subreddit.stylesheet is different than
