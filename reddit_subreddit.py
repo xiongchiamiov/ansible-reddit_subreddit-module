@@ -26,12 +26,18 @@ def main():
                          password=module.params['password'],
                          user_agent=user_agent)
 
-    stylesheet = reddit.subreddit(module.params['subreddit']).stylesheet
+    subreddit = reddit.subreddit(module.params['subreddit'])
+    current_text = subreddit.stylesheet().stylesheet
     new_text = '.foo { color: red; }'
-    stylesheet.update(new_text)
+    changed = current_text != new_text
+    if changed:
+        # Note that subreddit.stylesheet is different than
+        # subreddit.stylesheet() !
+        subreddit.stylesheet.update(new_text)
 
-    module.exit_json(changed=True, read_only=reddit.read_only,
-                     params=module.params)
+    module.exit_json(changed=changed, read_only=reddit.read_only,
+                     params=module.params, current_text=current_text,
+                     new_text=new_text)
 
 if __name__ == '__main__':
     main()
