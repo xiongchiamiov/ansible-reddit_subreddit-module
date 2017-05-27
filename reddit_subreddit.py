@@ -36,9 +36,18 @@ def main():
         # subreddit.stylesheet() !
         subreddit.stylesheet.update(new_text)
 
+    # Implementing --diff support doesn't seem to be well-documented.  This
+    # code is based on these pages:
+    #   * https://groups.google.com/forum/#!topic/ansible-devel/-Vclg-cxJhM
+    #   * https://github.com/ansible/ansible-modules-core/pull/2896/files
+    diff = {}
+    if module._diff:
+        diff['before'] = current_text
+        diff['after'] = new_text
+
     module.exit_json(changed=changed, read_only=reddit.read_only,
                      params=module.params, current_text=current_text,
-                     new_text=new_text)
+                     new_text=new_text, diff=diff)
 
 if __name__ == '__main__':
     main()
