@@ -7,8 +7,11 @@ VERSION = '0.0.1'
 
 def main():
     argument_spec = {
-        'client_id': {"required": True, "type": "str"},
-        'client_secret': {"required": True, "type": "str"},
+        'client_id': {'required': True, 'type': 'str'},
+        'client_secret': {'required': True, 'type': 'str'},
+        'username': {'required': True, 'type': 'str'},
+        'password': {'required': True, 'type': 'str'},
+        'subreddit': {'required': True, 'type': 'str'},
     }
     module = AnsibleModule(argument_spec=argument_spec)
 
@@ -19,9 +22,16 @@ def main():
                  '(by u/xiongchiamiov)'.format(VERSION)
     reddit = praw.Reddit(client_id=module.params['client_id'],
                          client_secret=module.params['client_secret'],
+                         username=module.params['username'],
+                         password=module.params['password'],
                          user_agent=user_agent)
 
-    module.exit_json(changed=True)
+    stylesheet = reddit.subreddit(module.params['subreddit']).stylesheet
+    new_text = '.foo { color: red; }'
+    stylesheet.update(new_text)
+
+    module.exit_json(changed=True, read_only=reddit.read_only,
+                     params=module.params)
 
 if __name__ == '__main__':
     main()
